@@ -100,41 +100,45 @@ def run_single_split(experiment_name, model_name, dataset, num_training_runs, da
         test_metrics_for_all_inits = []
         _log.info(f"Starting {num_training_runs} training runs for split {split_no}.\n\n")
 
-        tf_graph = tf.Graph()
-        with tf_graph.as_default():
-            split_slug = get_split_feed_dicts(*split_indices)
-            model = _build_model(*dataset_slug, *split_slug)
+        # GPU configuration for TF2: set visible devices if device_id is provided
+        if device_id is not None:
+            try:
+                gpus = tf.config.list_physical_devices('GPU')
+                if gpus:
+                    # Assuming device_id is an index (as string) of the GPU
+                    tf.config.set_visible_devices(gpus[int(device_id)], 'GPU')
+            except Exception as e:
+                _log.error(e)
+        
+        # In TF2, eager execution is enabled by default, so we don't need to create a graph or session
+        split_slug = get_split_feed_dicts(*split_indices)
+        model = _build_model(*dataset_slug, *split_slug)
 
-            config = tf.ConfigProto()
-            config.gpu_options.allow_growth = True
-            if device_id is not None:
-                config.gpu_options.visible_device_list = device_id
+        # Build training operations using TF2 style; assume build_train_ops returns a train_step callable,
+        # early_stopping, global_step, an initialization function (init_op) and a learning rate function
+        train_step, early_stopping, global_step, init_op, learning_rate = build_train_ops(
+            model,
+            early_stopping_tolerance, early_stopping_criterion, improvement_tolerance, learning_rate, _log
+        )
 
-            with tf.Session(config=config) as sess:
-                train_step, early_stopping, learning_rate_placeholder, global_step, init_op = \
-                    build_train_ops(sess, model,
-                                    early_stopping_tolerance, early_stopping_criterion, improvement_tolerance,
-                                    _run, _log)
-                tf_graph.finalize()
+        # Initialize variables if necessary (init_op should be a callable that performs initialization)
+        init_op()
 
-                for run_no in range(num_training_runs):
-                    _log.info(f"Starting run {run_no} for split {split_no}...\n---")
-
-                    tf.set_random_seed(tf_seeds[run_no])
-
-                    final_test_metrics = run_train_ops(sess, train_step, early_stopping, learning_rate_placeholder,
-                                                       global_step, init_op,
-                                                       *split_slug[-4:], metrics,
-                                                       model, learning_rate, num_epochs, early_stopping_criterion,
-                                                       alternating_optimization_interval, lr_decay_factor,
-                                                       lr_decay_steps,
-                                                       report_interval, _run, run_no, _log, traces)
-                    test_metrics_for_all_inits.append(final_test_metrics)
-
-                # training done, reset everything for next training run with different initialization
-                # not needed anymore when actively creating graph
-                # tf.reset_default_graph()
-                _log.info("---\n")
+        for run_no in range(num_training_runs):
+            _log.info(f"Starting run {run_no} for split {split_no}...\n---")
+            tf.random.set_seed(tf_seeds[run_no])
+            
+            final_test_metrics = run_train_ops(
+                train_step, early_stopping, global_step, init_op,
+                *split_slug[-4:], metrics,
+                model, learning_rate, num_epochs, early_stopping_criterion,
+                alternating_optimization_interval, lr_decay_factor,
+                lr_decay_steps,
+                report_interval, _run, run_no, _log, traces
+            )
+            test_metrics_for_all_inits.append(final_test_metrics)
+        
+        _log.info("---\n")
 
         test_metrics_collected = defaultdict(list)
         for test_metrics in test_metrics_for_all_inits:

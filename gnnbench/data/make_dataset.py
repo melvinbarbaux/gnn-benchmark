@@ -7,6 +7,7 @@ import networkx as nx
 import numpy as np
 import scipy.sparse as sp
 import tensorflow as tf
+  # TensorFlow 2.x utilise l'exécution eager par défaut
 
 from gnnbench.data.io import load_dataset
 from gnnbench.data.preprocess import to_binary_bag_of_words, remove_underrepresented_classes, \
@@ -136,14 +137,13 @@ def sample_per_class(random_state, labels, num_examples_per_class, forbidden_ind
 
 
 def get_split_feed_dicts(train_indices, val_indices, test_indices):
-    dataset_indices_placeholder = tf.placeholder(tf.int32, shape=[None], name='dataset_indices_placeholder')
-
-    train_feed = {dataset_indices_placeholder: train_indices}
-    trainval_feed = {dataset_indices_placeholder: train_indices}
-    val_feed = {dataset_indices_placeholder: val_indices}
-    test_feed = {dataset_indices_placeholder: test_indices}
-
-    return dataset_indices_placeholder, train_feed, trainval_feed, val_feed, test_feed
+    dataset_indices = tf.constant(train_indices, dtype=tf.int32, name='dataset_indices')
+    train_feed = tf.constant(train_indices, dtype=tf.int32, name='train_feed')
+    trainval_feed = tf.constant(train_indices, dtype=tf.int32, name='trainval_feed')
+    val_feed = tf.constant(val_indices, dtype=tf.int32, name='val_feed')
+    test_feed = tf.constant(test_indices, dtype=tf.int32, name='test_feed')
+    
+    return dataset_indices, train_feed, trainval_feed, val_feed, test_feed
 
 
 def get_dataset_and_split_planetoid(dataset, data_path, _log):

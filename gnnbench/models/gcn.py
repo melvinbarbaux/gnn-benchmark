@@ -1,5 +1,5 @@
 import tensorflow as tf
-import tensorflow.contrib.slim as slim
+import tf_slim as slim
 from sacred import Ingredient
 
 from gnnbench.data.preprocess import row_normalize, renormalize_adj
@@ -16,10 +16,10 @@ def graph_convolution(inputs, sparse_renormalized_laplacian, weights, input_is_s
     D~ = diagonal matrix of node degrees deduced from A~.
     """
     if input_is_sparse:
-        output = tf.sparse_tensor_dense_matmul(inputs, weights)
+        output = tf.sparse.sparse_dense_matmul(inputs, weights)
     else:
         output = tf.matmul(inputs, weights)
-    return tf.sparse_tensor_dense_matmul(sparse_renormalized_laplacian, output)
+    return tf.sparse.sparse_dense_matmul(sparse_renormalized_laplacian, output)
 
 
 def graph_convolution_layer(output_dim,
@@ -31,11 +31,20 @@ def graph_convolution_layer(output_dim,
                             input_is_sparse=False):
     with tf.name_scope(name):
         input_dim = int(inputs.get_shape()[1])
-        weights = tf.get_variable("%s-weights" % name, [input_dim, output_dim], dtype=tf.float32,
-                                  initializer=tf.glorot_uniform_initializer(),
-                                  regularizer=slim.l2_regularizer(weight_decay))
-        bias = tf.get_variable("%s-bias" % name, [output_dim], dtype=tf.float32,
-                               initializer=tf.zeros_initializer())
+        # Create weights using TF2's tf.Variable and Keras initializer
+        weights = tf.Variable(
+            tf.keras.initializers.GlorotUniform()(shape=[input_dim, output_dim]),
+            name="%s-weights" % name,
+            dtype=tf.float32,
+            trainable=True
+        )
+        # Create bias using TF2's tf.Variable and Keras initializer
+        bias = tf.Variable(
+            tf.keras.initializers.Zeros()(shape=[output_dim]),
+            name="%s-bias" % name,
+            dtype=tf.float32,
+            trainable=True
+        )
 
         # Apply dropout to inputs if required
         inputs = tf.cond(
@@ -108,11 +117,7 @@ def build_model(graph_adj, node_features, labels, dataset_indices_placeholder,
                 train_feed, trainval_feed, val_feed, test_feed,
                 weight_decay, normalize_features,
                 num_layers, hidden_size, dropout_prob):
-    dropout = tf.placeholder(dtype=tf.float32, shape=[])
-    train_feed[dropout] = dropout_prob
-    trainval_feed[dropout] = False
-    val_feed[dropout] = False
-    test_feed[dropout] = False
+    dropout = dropout_prob
 
     return GCN(node_features, graph_adj, labels, dataset_indices_placeholder,
                num_layers=num_layers, hidden_size=hidden_size,

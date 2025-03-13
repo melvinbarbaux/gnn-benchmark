@@ -59,12 +59,9 @@ class GNNModel(object):
         with tf.name_scope('loss'):
             output = self.inference
             loss = tf.reduce_mean(
-                tf.nn.softmax_cross_entropy_with_logits_v2(logits=output, labels=self.targets)
+                tf.nn.softmax_cross_entropy_with_logits(logits=output, labels=self.targets)
             )
-            regularization_losses = tf.losses.get_regularization_losses()
-            if not regularization_losses:
-                return loss
-            return loss + tf.add_n(regularization_losses)
+            return loss
 
     def _build_model_graphs(self):
         """
@@ -101,6 +98,15 @@ class GNNModel(object):
         """
         raise NotImplementedError
 
+    @property
+    def trainable_variables(self):
+        # Return all tf.Variable instances found in the instance's attributes
+        vars = []
+        for attr in self.__dict__.values():
+            if isinstance(attr, tf.Variable):
+                vars.append(attr)
+        return vars
+
     def optimize(self, learning_rate, global_step):
         """
         Defines the optimizing operation for the model.
@@ -117,5 +123,15 @@ class GNNModel(object):
         train_step : tf.Tensor
             The optimiziation operation for one train step.
         """
-        optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
-        return optimizer.minimize(self.loss, global_step=global_step)
+        optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
+
+        @tf.function
+        def train_step():
+            with tf.GradientTape() as tape:
+                loss = self.loss
+            gradients = tape.gradient(loss, self.trainable_variables)
+            optimizer.apply_gradients(zip(gradients, self.trainable_variables))
+            global_step.assign_add(1)
+            return loss
+
+        return train_step

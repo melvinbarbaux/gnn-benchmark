@@ -14,7 +14,7 @@ SCRIPT_PATH = Path(gnnbench.__file__).parent / 'run_single_job.py'
 def do_work(db_host, db_port, device, log_verbose):
     pending = get_pending_collection(db_host, db_port)
 
-    if pending.count() <= 0:
+    if pending.count_documents({}) <= 0:
         print("No pending jobs. Exiting...")
         return
 
