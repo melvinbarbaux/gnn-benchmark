@@ -7,7 +7,7 @@ experiment_name: "baselines"
 #                                See `configs/hyperparameter_search.yaml` for an example.
 experiment_mode: "fixed_configurations"
 # Random seed (for reproducibility).
-seed: 2018
+seed: 2025
 # Number of train/validation/test splits
 num_different_splits: 2
 # Number of random weight initializations
@@ -16,34 +16,34 @@ num_inits: 2
 
 # Path to the file with default hyperparameter configuration for training.
 # You might need to change this to the absolute path.
-default_config: "config/train.conf.yaml"
+default_config: "/Users/melvin/Documents/gnn-benchmark/config/train.conf.yaml"
 
 # List of models to train.
 # Each model is defined by a YAML configuration file.
 # Configurations in the model configuration files may override parameters from the default training configurations.
 # See config/optimized/gcn.conf.yaml for an example.
 models:
-    - "config/optimized/gcn.conf.yaml"
-    - "config/optimized/gat.conf.yaml"
-    - "config/optimized/monet.conf.yaml"
-    - "config/optimized/graphsage_mean.conf.yaml"
-    - "config/optimized/graphsage_maxpool.conf.yaml"
-    - "config/optimized/graphsage_meanpool.conf.yaml"
-    - "config/optimized/mlp.conf.yaml"
-    - "config/optimized/logregr.conf.yaml"
-    - "config/optimized/labelprop_vanilla.conf.yaml"
-    - "config/optimized/labelprop_smoothed.conf.yaml"
+    - "/Users/melvin/Documents/gnn-benchmark/config/optimized/gcn.conf.yaml"
+#    - "/Users/melvin/Documents/gnn-benchmark/config/optimized/gat.conf.yaml"
+#    - "/Users/melvin/Documents/gnn-benchmark/config/optimized/monet.conf.yaml"
+#    - "/Users/melvin/Documents/gnn-benchmark/config/optimized/graphsage_mean.conf.yaml"
+#    - "/Users/melvin/Documents/gnn-benchmark/config/optimized/graphsage_maxpool.conf.yaml"
+#    - "/Users/melvin/Documents/gnn-benchmark/config/optimized/graphsage_meanpool.conf.yaml"
+#    - "/Users/melvin/Documents/gnn-benchmark/config/optimized/mlp.conf.yaml"
+#    - "/Users/melvin/Documents/gnn-benchmark/config/optimized/logregr.conf.yaml"
+#    - "/Users/melvin/Documents/gnn-benchmark/config/optimized/labelprop_vanilla.conf.yaml"
+#    - "/Users/melvin/Documents/gnn-benchmark/config/optimized/labelprop_smoothed.conf.yaml"
 
 # List of datasets to run experiments on.
 datasets:
-    - "data/npz/cora.npz"
-    - "data/npz/citeseer.npz"
-    - "data/npz/pubmed.npz"
-    - "data/npz/cora_full.npz"
-    - "data/npz/ms_academic_cs.npz"
-    - "data/npz/ms_academic_phy.npz"
-    - "data/npz/amazon_electronics_computers.npz"
-    - "data/npz/amazon_electronics_photo.npz"
+    - "/Users/melvin/Documents/gnn-benchmark/data/npz/cora.npz"
+#    - "/Users/melvin/Documents/gnn-benchmark/data/npz/citeseer.npz"
+#    - "/Users/melvin/Documents/gnn-benchmark/data/npz/pubmed.npz"
+#    - "/Users/melvin/Documents/gnn-benchmark/data/npz/cora_full.npz"
+#    - "/Users/melvin/Documents/gnn-benchmark/data/npz/ms_academic_cs.npz"
+#    - "/Users/melvin/Documents/gnn-benchmark/data/npz/ms_academic_phy.npz"
+#    - "/Users/melvin/Documents/gnn-benchmark/data/npz/amazon_electronics_computers.npz"
+#    - "/Users/melvin/Documents/gnn-benchmark/data/npz/amazon_electronics_photo.npz"
 
 # Datasets can be provided in one of the following formats:
 #     - npz                 Load data stored in compressed numpy binary format. This is the preferred way to store and

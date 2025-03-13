@@ -8,11 +8,11 @@ from gnnbench.util import get_pending_collection, generate_random_parameter_sett
 
 def generate_configs(pending, fixed, experiment_config):
     with open(experiment_config["default_config"]) as conf:
-        train_config = yaml.load(conf)
+        train_config = yaml.load(conf, Loader=yaml.FullLoader)
 
     for model_config_path in experiment_config['models']:
         with open(model_config_path) as conf:
-            model_config = yaml.load(conf)
+            model_config = yaml.load(conf, Loader=yaml.FullLoader)
 
         if fixed:
             param_sweep = [(experiment_config['experiment_name'], {})]
@@ -86,15 +86,15 @@ def load_search_config(searchspace_path):
 
 
 def report_pending_status(pending):
-    count = pending.count()
-    running = pending.find({"running": True})
-    print(f"{count} entries in database, {running.count()} running.")
+    count = pending.count_documents({})
+    running_count = pending.count_documents({"running": True})
+    print(f"{count} entries in database, {running_count} running.")
 
 
 def reset_running_status(pending):
     print("Setting 'running' to False for all configs in database.")
 
-    if pending.count() <= 0:
+    if pending.count_documents({}) <= 0:
         print("No pending jobs. Exiting...")
         return
 

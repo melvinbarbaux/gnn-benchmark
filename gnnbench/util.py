@@ -145,7 +145,7 @@ def get_mongo_config(config_path):
 
 def get_experiment_config(config_path):
     with open(config_path, 'r') as conf:
-        return yaml.load(conf)
+        return yaml.load(conf, Loader=yaml.FullLoader)
 
 
 def get_pending_collection(db_host, db_port):
