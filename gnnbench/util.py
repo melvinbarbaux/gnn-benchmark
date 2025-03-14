@@ -139,7 +139,7 @@ def generate_random_parameter_settings(search_spaces_dict, num_experiments, seed
 
 def get_mongo_config(config_path):
     with open(config_path, 'r') as conf:
-        config = yaml.load(conf)
+        config = yaml.load(conf, Loader=yaml.FullLoader)
     return config['db_host'], config['db_port']
 
 

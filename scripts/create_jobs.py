@@ -82,7 +82,7 @@ def insert_configs(pending, param_sweep, train_config, model_config, experiment_
 
 def load_search_config(searchspace_path):
     with open(searchspace_path, "r") as f:
-        return yaml.load(f)
+        return yaml.load(f, Loader=yaml.FullLoader)
 
 
 def report_pending_status(pending):
