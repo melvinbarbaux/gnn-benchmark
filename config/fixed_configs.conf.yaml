@@ -23,8 +23,8 @@ default_config: "/Users/melvin/Documents/gnn-benchmark/config/train.conf.yaml"
 # Configurations in the model configuration files may override parameters from the default training configurations.
 # See config/optimized/gcn.conf.yaml for an example.
 models:
-    - "/Users/melvin/Documents/gnn-benchmark/config/optimized/gcn.conf.yaml"
-#    - "/Users/melvin/Documents/gnn-benchmark/config/optimized/gat.conf.yaml"
+#    - "/Users/melvin/Documents/gnn-benchmark/config/optimized/gcn.conf.yaml"
+    - "/Users/melvin/Documents/gnn-benchmark/config/optimized/gat.conf.yaml"
 #    - "/Users/melvin/Documents/gnn-benchmark/config/optimized/monet.conf.yaml"
 #    - "/Users/melvin/Documents/gnn-benchmark/config/optimized/graphsage_mean.conf.yaml"
 #    - "/Users/melvin/Documents/gnn-benchmark/config/optimized/graphsage_maxpool.conf.yaml"

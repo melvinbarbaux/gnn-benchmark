@@ -27,38 +27,38 @@ default_config: "config/train.conf.yaml"
 # See config/optimized/gcn.conf.yaml for an example.
 # Note that a hyperparameter search on LabelProp_vanilla is superfluous since it has no tunable hyperparameters.
 models:
-    - "/Users/melvin/Documents/gnn-benchmark/config/optimized/gcn.conf.yaml"
+    #- "/Users/melvin/Documents/gnn-benchmark/config/optimized/gcn.conf.yaml"
     - "/Users/melvin/Documents/gnn-benchmark/config/optimized/gat.conf.yaml"
-    - "/Users/melvin/Documents/gnn-benchmark/config/optimized/monet.conf.yaml"
-    - "/Users/melvin/Documents/gnn-benchmark/config/optimized/graphsage_mean.conf.yaml"
-    - "/Users/melvin/Documents/gnn-benchmark/config/optimized/graphsage_maxpool.conf.yaml"
-    - "/Users/melvin/Documents/gnn-benchmark/config/optimized/graphsage_meanpool.conf.yaml"
-    - "/Users/melvin/Documents/gnn-benchmark/config/optimized/mlp.conf.yaml"
-    - "/Users/melvin/Documents/gnn-benchmark/config/optimized/logregr.conf.yaml"
-    - "/Users/melvin/Documents/gnn-benchmark/config/optimized/labelprop_smoothed.conf.yaml"
+    #- "/Users/melvin/Documents/gnn-benchmark/config/optimized/monet.conf.yaml"
+    #- "/Users/melvin/Documents/gnn-benchmark/config/optimized/graphsage_mean.conf.yaml"
+    #- "/Users/melvin/Documents/gnn-benchmark/config/optimized/graphsage_maxpool.conf.yaml"
+    #- "/Users/melvin/Documents/gnn-benchmark/config/optimized/graphsage_meanpool.conf.yaml"
+    #- "/Users/melvin/Documents/gnn-benchmark/config/optimized/mlp.conf.yaml"
+    #- "/Users/melvin/Documents/gnn-benchmark/config/optimized/logregr.conf.yaml"
+    #- "/Users/melvin/Documents/gnn-benchmark/config/optimized/labelprop_smoothed.conf.yaml"
 
 # List of model names pointing to the corresponding search space configuration file.
 searchspaces:
-    GCN: "/Users/melvin/Documents/gnn-benchmark/config/searchspace/gcn.searchspace.yaml"
+    #GCN: "/Users/melvin/Documents/gnn-benchmark/config/searchspace/gcn.searchspace.yaml"
     GAT: "/Users/melvin/Documents/gnn-benchmark/config/searchspace/gat.searchspace.yaml"
-    MoNet: "/Users/melvin/Documents/gnn-benchmark/config/searchspace/monet.searchspace.yaml"
-    GraphSAGE_mean: "/Users/melvin/Documents/gnn-benchmark/config/searchspace/graphsage_mean.searchspace.yaml"
-    GraphSAGE_maxpool: "/Users/melvin/Documents/gnn-benchmark/config/searchspace/graphsage_maxpool.searchspace.yaml"
-    GraphSAGE_meanpool: "/Users/melvin/Documents/gnn-benchmark/config/searchspace/graphsage_meanpool.searchspace.yaml"
-    MLP: "/Users/melvin/Documents/gnn-benchmark/config/searchspace/mlp.searchspace.yaml"
-    LogRegr: "/Users/melvin/Documents/gnn-benchmark/config/searchspace/logregr.searchspace.yaml"
-    LabelProp_smoothed: "/Users/melvin/Documents/gnn-benchmark/config/searchspace/labelprop_smoothed.searchspace.yaml"
+    #MoNet: "/Users/melvin/Documents/gnn-benchmark/config/searchspace/monet.searchspace.yaml"
+    #GraphSAGE_mean: "/Users/melvin/Documents/gnn-benchmark/config/searchspace/graphsage_mean.searchspace.yaml"
+    #GraphSAGE_maxpool: "/Users/melvin/Documents/gnn-benchmark/config/searchspace/graphsage_maxpool.searchspace.yaml"
+    #GraphSAGE_meanpool: "/Users/melvin/Documents/gnn-benchmark/config/searchspace/graphsage_meanpool.searchspace.yaml"
+    #MLP: "/Users/melvin/Documents/gnn-benchmark/config/searchspace/mlp.searchspace.yaml"
+    #LogRegr: "/Users/melvin/Documents/gnn-benchmark/config/searchspace/logregr.searchspace.yaml"
+    #LabelProp_smoothed: "/Users/melvin/Documents/gnn-benchmark/config/searchspace/labelprop_smoothed.searchspace.yaml"
 
 # List of datasets to run searches on.
 datasets:
     - "/Users/melvin/Documents/gnn-benchmark/data/npz/cora.npz"
-    - "/Users/melvin/Documents/gnn-benchmark/data/npz/citeseer.npz"
-    - "/Users/melvin/Documents/gnn-benchmark/data/npz/pubmed.npz"
-    - "/Users/melvin/Documents/gnn-benchmark/data/npz/cora_full.npz"
-    - "/Users/melvin/Documents/gnn-benchmark/data/npz/ms_academic_cs.npz"
-    - "/Users/melvin/Documents/gnn-benchmark/data/npz/ms_academic_phy.npz"
-    - "/Users/melvin/Documents/gnn-benchmark/data/npz/amazon_electronics_computers.npz"
-    - "/Users/melvin/Documents/gnn-benchmark/data/npz/amazon_electronics_photo.npz"
+    #- "/Users/melvin/Documents/gnn-benchmark/data/npz/citeseer.npz"
+    #- "/Users/melvin/Documents/gnn-benchmark/data/npz/pubmed.npz"
+    #- "/Users/melvin/Documents/gnn-benchmark/data/npz/cora_full.npz"
+    #- "/Users/melvin/Documents/gnn-benchmark/data/npz/ms_academic_cs.npz"
+    #- "/Users/melvin/Documents/gnn-benchmark/data/npz/ms_academic_phy.npz"
+    #- "/Users/melvin/Documents/gnn-benchmark/data/npz/amazon_electronics_computers.npz"
+    #- "/Users/melvin/Documents/gnn-benchmark/data/npz/amazon_electronics_photo.npz"
 
 # Datasets can be provided in one of the following formats:
 #     - npz                 Load data stored in compressed numpy binary format. This is the preferred way to store and

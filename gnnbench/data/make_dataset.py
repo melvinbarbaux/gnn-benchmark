@@ -136,14 +136,11 @@ def sample_per_class(random_state, labels, num_examples_per_class, forbidden_ind
 
 
 def get_split_feed_dicts(train_indices, val_indices, test_indices):
-    dataset_indices_placeholder = tf.placeholder(tf.int32, shape=[None], name='dataset_indices_placeholder')
-
-    train_feed = {dataset_indices_placeholder: train_indices}
-    trainval_feed = {dataset_indices_placeholder: train_indices}
-    val_feed = {dataset_indices_placeholder: val_indices}
-    test_feed = {dataset_indices_placeholder: test_indices}
-
-    return dataset_indices_placeholder, train_feed, trainval_feed, val_feed, test_feed
+    train_feed = {'dataset_indices': train_indices}
+    trainval_feed = {'dataset_indices': train_indices}
+    val_feed = {'dataset_indices': val_indices}
+    test_feed = {'dataset_indices': test_indices}
+    return train_feed, trainval_feed, val_feed, test_feed
 
 
 def get_dataset_and_split_planetoid(dataset, data_path, _log):
@@ -186,7 +183,6 @@ def get_dataset_and_split_planetoid(dataset, data_path, _log):
     features[test_idx_reorder, :] = features[test_idx_range, :]
     adj = nx.adjacency_matrix(nx.from_dict_of_lists(graph))
 
-    # cast!!!
     adj = adj.astype(np.float32)
     features = features.tocsr()
     features = features.astype(np.float32)
@@ -199,4 +195,3 @@ def get_dataset_and_split_planetoid(dataset, data_path, _log):
     idx_val = list(range(len(y), len(y) + 500))
 
     return adj, features, labels, idx_train, idx_val, idx_test
-

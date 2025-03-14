@@ -5,7 +5,7 @@
 # Training procedure parameters.
 
 # Maximum number of epochs to train for. Should be large enough for early stopping to take effect.
-num_epochs: 100000
+num_epochs: 100
 
 # The early stopping criterion to use. Must be one of
 #     - gcn        Early stopping criterion used in [1]. Early stopping if validation loss is larger than the mean of

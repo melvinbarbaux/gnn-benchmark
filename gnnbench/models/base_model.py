@@ -5,7 +5,7 @@ __all__ = [
 ]
 
 
-class GNNModel(object):
+class GNNModel(tf.keras.Model):
     """Base class for all Graph Neural Network (GNN) models."""
 
     def __init__(self, features, graph_adj, targets):
@@ -20,9 +20,11 @@ class GNNModel(object):
         targets : np.ndarray, shape [num_nodes, num_classes]
             One-hot matrix of node labels.
         """
+        super(GNNModel, self).__init__()
         self.targets = targets
         self.graph_adj = self._preprocess_adj(graph_adj)
         self.features = self._preprocess_features(features)
+        self._build_model_graphs()
 
     def _inference(self):
         """
@@ -31,45 +33,48 @@ class GNNModel(object):
         Returns
         -------
         logits : tf.Tensor, shape [num_nodes, num_classes]
-            The logits produced by the model (before feeding into softmax).
+            The logits produced by the model (before softmax).
         """
         raise NotImplementedError
 
+    def call(self, inputs=None, training=False):
+        """
+        Overrides tf.keras.Model call. Here, we simply return the inference.
+        """
+        return self._inference()
+
     def _predict(self):
         """
-        Computes predictions of the model on the targets given in the constructor.
+        Computes predictions on the targets given in the constructor.
 
         Returns
         -------
         predictions : tf.Tensor, shape [num_nodes, num_classes]
             Softmax probabilities for each node and each class.
         """
-        with tf.name_scope('predict'):
-            return tf.nn.softmax(self.inference)
+        return tf.nn.softmax(self.inference)
 
     def _loss(self):
         """
-        Computes the cross-entropy plus regularization loss of the model on the targets given in the constructor.
+        Computes the cross-entropy plus regularization loss on the targets.
 
         Returns
         -------
         loss : tf.Tensor, shape [], dtype tf.float32
-            A Tensor that, if evaluated, yields the model's loss on the targets given in the constructor.
+            The loss tensor.
         """
-        with tf.name_scope('loss'):
-            output = self.inference
-            loss = tf.reduce_mean(
-                tf.nn.softmax_cross_entropy_with_logits_v2(logits=output, labels=self.targets)
-            )
-            regularization_losses = tf.losses.get_regularization_losses()
-            if not regularization_losses:
-                return loss
-            return loss + tf.add_n(regularization_losses)
+        output = self.inference
+        loss = tf.reduce_mean(
+            tf.nn.softmax_cross_entropy_with_logits(logits=output, labels=self.targets)
+        )
+        regularization_losses = self.losses
+        if not regularization_losses:
+            return loss
+        return loss + tf.add_n(regularization_losses)
 
     def _build_model_graphs(self):
         """
-        Builds the graph portions for inference, prediction and loss computation and adds them as fields to the class.
-        Call this method as the last statement of your __init__.
+        Builds the inference, prediction and loss parts of the model.
         """
         self.inference = self._inference()
         self.predict = self._predict()
@@ -77,45 +82,52 @@ class GNNModel(object):
 
     def _preprocess_features(self, features):
         """
-        Preprocessing function for the features. Called by the constructor. Even if no preprocessing is needed, the
-        features might need to be converted to a tf.SparseTensor in this method using the function
-        util.to_sparse_tensor.
+        Preprocess the features. Even if no preprocessing is needed
 
         Returns
         -------
         features_tensor : tf.Tensor or tf.SparseTensor
-            The features as a (sparse) tensor.
+            The preprocessed features.
         """
         raise NotImplementedError
 
     def _preprocess_adj(self, graph_adj):
         """
-        Preprocessing function for the adjacency matrix. Called by the constructor. Even if no preprocessing is needed,
-        the adjacency matrix might need to be converted to a tf.SparseTensor in this method using the function
-        util.to_sparse_tensor.
+        Preprocess the adjacency matrix. Even if no preprocessing is needed, conversion en tf.SparseTensor
+        peut être effectuée ici.
 
         Returns
         -------
         graph_adj_tensor : tf.Tensor or tf.SparseTensor
-            The adjacency matrix as a (sparse) tensor.
+            The preprocessed adjacency matrix.
         """
         raise NotImplementedError
 
     def optimize(self, learning_rate, global_step):
         """
-        Defines the optimizing operation for the model.
+        Defines a training step function for the model using TensorFlow 2 idioms.
 
         Parameters
         ----------
-        learning_rate : tf.Tensor, shape [], dtype tf.float32 or scalar
-            The initial learning rate for the optimizer.
-        global_step : tf.Variable, shape [], dtype tf.int32
-            The global step of the training process. Will be incremented by the optimizer.
+        learning_rate : float
+            The learning rate for the optimizer.
+        global_step : tf.Variable
+            A variable tracking the global training step.
 
         Returns
         -------
-        train_step : tf.Tensor
-            The optimiziation operation for one train step.
+        train_step : function
+            A tf.function performing one training step and returning the loss.
         """
-        optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
-        return optimizer.minimize(self.loss, global_step=global_step)
+        optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
+
+        @tf.function
+        def train_step():
+            with tf.GradientTape() as tape:
+                loss_value = self._loss()
+            gradients = tape.gradient(loss_value, self.trainable_variables)
+            optimizer.apply_gradients(zip(gradients, self.trainable_variables))
+            global_step.assign_add(1)
+            return loss_value
+
+        return train_step
